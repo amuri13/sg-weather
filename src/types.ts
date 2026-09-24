@@ -151,6 +151,7 @@ export interface HealthResponse {
   status: 'ok' | 'degraded';
   keyConfigured: boolean;
   allAnswered: boolean;
+  endpointCount?: number;
   endpoints: Record<string, HealthEndpointStatus>;
   timestamp: string;
 }
