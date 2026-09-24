@@ -99,14 +99,6 @@ export const REGION_AREAS: Record<SingaporeRegion, string[]> = {
   ],
 };
 
-const REGION_DEFAULT_AREAS: Record<SingaporeRegion, string> = {
-  North: 'Woodlands',
-  South: 'HarbourFront',
-  East: 'Tampines',
-  West: 'Jurong',
-  Central: 'Orchard',
-};
-
 const SECTOR_ACCENTS: Record<
   SingaporeRegion,
   {
@@ -259,12 +251,6 @@ export const WeatherPanel: React.FC<WeatherPanelProps> = () => {
     };
   }, []);
 
-  const handleRegionSelect = (region: SingaporeRegion) => {
-    setSelectedRegion(region);
-    const defaultArea = REGION_DEFAULT_AREAS[region];
-    setSelectedArea(defaultArea);
-  };
-
   const handleAreaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const nextArea = e.target.value;
     setSelectedArea(nextArea);
@@ -331,10 +317,6 @@ export const WeatherPanel: React.FC<WeatherPanelProps> = () => {
     data.fourDayOutlook.forecasts.length > 0 &&
     !data.fourDayOutlook.error;
 
-  const regionSpecificAreas = availableAreas.length > 0
-    ? REGION_AREAS[selectedRegion]?.filter((a) => availableAreas.includes(a)) || REGION_AREAS[selectedRegion]
-    : REGION_AREAS[selectedRegion];
-
   const regions: SingaporeRegion[] = ['North', 'South', 'East', 'West', 'Central'];
   const activeSectorTheme = SECTOR_ACCENTS[selectedRegion] || SECTOR_ACCENTS.Central;
 
@@ -353,63 +335,41 @@ export const WeatherPanel: React.FC<WeatherPanelProps> = () => {
 
   return (
     <div className="flex-1 flex flex-col min-h-0 w-full overflow-hidden transition-colors duration-200">
-      {/* Persistent Sector Buttons, Area Selector, Refresh Action */}
+      {/* Persistent Area Selector and Refresh Action (Sector Selection removed) */}
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200/90 dark:border-slate-800 px-4 py-2.5 shrink-0 flex flex-wrap items-center justify-between gap-3 shadow-2xs transition-colors duration-200">
-        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-          {/* 5-Sector Segmented Switcher */}
-          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/90 p-1 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
-            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider px-2 hidden md:inline">
-              Sector:
-            </span>
-            {regions.map((reg) => {
-              const isActive = selectedRegion === reg;
-              const sectorStyle = SECTOR_ACCENTS[reg];
-              return (
-                <button
-                  key={reg}
-                  onClick={() => handleRegionSelect(reg)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 cursor-pointer ${
-                    isActive
-                      ? sectorStyle.bgActive
-                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-700/60'
-                  }`}
-                >
-                  <span className="flex items-center gap-1.5">
-                    <span
-                      className={`w-1.5 h-1.5 rounded-full ${
-                        isActive ? 'bg-white' : sectorStyle.dot
-                      }`}
-                    />
-                    <span>{reg}</span>
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Area Dropdown with Sector Color Hint */}
-          <div className="flex items-center gap-1.5 text-xs">
-            <span className="text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
-              Area:
-            </span>
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Direct Area Selection Dropdown with Sector Optgroups */}
+          <div className="flex items-center gap-2 text-xs">
+            <label
+              htmlFor="area-select"
+              className="text-slate-600 dark:text-slate-300 font-semibold flex items-center gap-1.5"
+            >
+              <MapPin className="w-3.5 h-3.5 text-sky-500" />
+              <span>Area:</span>
+            </label>
             <div className="relative">
               <select
                 id="area-select"
                 value={selectedArea}
                 onChange={handleAreaChange}
-                className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs font-semibold rounded-lg pl-3 pr-8 py-1.5 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 appearance-none cursor-pointer shadow-2xs transition-colors duration-150"
+                className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs font-semibold rounded-lg pl-3 pr-8 py-1.5 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 appearance-none cursor-pointer shadow-2xs transition-colors duration-150 min-w-44"
               >
-                <optgroup label={`${selectedRegion} Sector Areas`}>
-                  {regionSpecificAreas.map((areaName) => (
-                    <option key={areaName} value={areaName}>
-                      {areaName}
-                    </option>
-                  ))}
-                </optgroup>
-                {availableAreas.length > 0 && (
-                  <optgroup label="All Other Singapore Areas">
+                {regions.map((reg) => {
+                  const areasInRegion = REGION_AREAS[reg];
+                  return (
+                    <optgroup key={reg} label={`${reg} Sector`}>
+                      {areasInRegion.map((areaName) => (
+                        <option key={areaName} value={areaName}>
+                          {areaName}
+                        </option>
+                      ))}
+                    </optgroup>
+                  );
+                })}
+                {availableAreas.filter((a) => !Object.values(REGION_AREAS).flat().includes(a)).length > 0 && (
+                  <optgroup label="Other Areas">
                     {availableAreas
-                      .filter((a) => !regionSpecificAreas.includes(a))
+                      .filter((a) => !Object.values(REGION_AREAS).flat().includes(a))
                       .map((areaName) => (
                         <option key={areaName} value={areaName}>
                           {areaName}
@@ -422,6 +382,14 @@ export const WeatherPanel: React.FC<WeatherPanelProps> = () => {
                 <MapPin className="w-3.5 h-3.5 text-sky-500" />
               </div>
             </div>
+
+            {/* Quiet Informative Sector Tag indicating detected sector for selected area */}
+            <span
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold border inline-flex items-center gap-1.5 transition-colors duration-200 ${activeSectorTheme.badge}`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${activeSectorTheme.dot}`} />
+              <span>{selectedRegion} Sector</span>
+            </span>
           </div>
         </div>
 
