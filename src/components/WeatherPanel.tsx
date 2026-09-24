@@ -26,29 +26,34 @@ export const REGION_AREAS: Record<SingaporeRegion, string[]> = {
     'Woodlands',
     'Yishun',
     'Sembawang',
+    'Canberra',
+    'Admiralty',
+    'Khatib',
     'Mandai',
     'Sungei Kadut',
     'Lim Chu Kang',
     'Seletar',
   ],
   South: [
-    'City',
-    'Bukit Merah',
-    'Queenstown',
+    'HarbourFront',
     'Sentosa',
+    'Telok Blangah',
+    'Tiong Bahru',
+    'Alexandra',
+    'Queenstown',
+    'Bukit Merah',
     'Southern Islands',
-    'Marine Parade',
-    'Tanglin',
-    'Novena',
   ],
   East: [
-    'Bedok',
     'Tampines',
     'Pasir Ris',
+    'Bedok',
+    'Simei',
     'Changi',
     'Paya Lebar',
+    'Katong',
+    'Marine Parade',
     'Geylang',
-    'Kallang',
     'Hougang',
     'Serangoon',
     'Sengkang',
@@ -57,33 +62,47 @@ export const REGION_AREAS: Record<SingaporeRegion, string[]> = {
     'Pulau Tekong',
   ],
   West: [
-    'Jurong East',
-    'Jurong West',
-    'Jurong Island',
-    'Boon Lay',
-    'Pioneer',
-    'Tuas',
+    'Jurong',
     'Clementi',
     'Bukit Batok',
     'Bukit Panjang',
-    'Bukit Timah',
     'Choa Chu Kang',
+    'Boon Lay',
+    'Jurong East',
+    'Jurong West',
+    'Jurong Island',
+    'Pioneer',
+    'Tuas',
     'Tengah',
+    'Bukit Timah',
     'Jalan Bahar',
-    'Toa Payoh',
-    'Bishan',
-    'Ang Mo Kio',
-    'Central Water Catchment',
     'Western Islands',
     'Western Water Catchment',
+  ],
+  Central: [
+    'Orchard',
+    'River Valley',
+    'Novena',
+    'Newton',
+    'Bishan',
+    'Toa Payoh',
+    'Kallang',
+    'Bugis',
+    'City Hall',
+    'Marina Bay',
+    'City',
+    'Ang Mo Kio',
+    'Tanglin',
+    'Central Water Catchment',
   ],
 };
 
 const REGION_DEFAULT_AREAS: Record<SingaporeRegion, string> = {
   North: 'Woodlands',
-  South: 'City',
+  South: 'HarbourFront',
   East: 'Tampines',
-  West: 'Jurong East',
+  West: 'Jurong',
+  Central: 'Orchard',
 };
 
 function getRegionForArea(area: string): SingaporeRegion {
@@ -93,7 +112,7 @@ function getRegionForArea(area: string): SingaporeRegion {
       return region as SingaporeRegion;
     }
   }
-  return 'South';
+  return 'Central';
 }
 
 function formatMinutesAgo(timestamp: string | null | undefined): string {
@@ -112,8 +131,8 @@ function formatValidPeriod(period: ForecastItem['validPeriod']): string {
 }
 
 export const WeatherPanel: React.FC = () => {
-  const [selectedRegion, setSelectedRegion] = useState<SingaporeRegion>('South');
-  const [selectedArea, setSelectedArea] = useState<string>('City');
+  const [selectedRegion, setSelectedRegion] = useState<SingaporeRegion>('Central');
+  const [selectedArea, setSelectedArea] = useState<string>('Orchard');
   const [activeTab, setActiveTab] = useState<WeatherTab>('live');
 
   const [data, setData] = useState<WeatherResponse | null>(null);
@@ -149,6 +168,12 @@ export const WeatherPanel: React.FC = () => {
       setData(json);
       if (Array.isArray(json.validAreas) && json.validAreas.length > 0) {
         setAvailableAreas(json.validAreas);
+      }
+      if (json.region) {
+        const reg = json.region as SingaporeRegion;
+        if (['North', 'South', 'East', 'West', 'Central'].includes(reg)) {
+          setSelectedRegion(reg);
+        }
       }
       setSecondsUntilRefresh(60);
     } catch (err: any) {
@@ -254,10 +279,10 @@ export const WeatherPanel: React.FC = () => {
     !data.fourDayOutlook.error;
 
   const regionSpecificAreas = availableAreas.length > 0
-    ? availableAreas.filter((a) => REGION_AREAS[selectedRegion]?.includes(a))
+    ? REGION_AREAS[selectedRegion]?.filter((a) => availableAreas.includes(a)) || REGION_AREAS[selectedRegion]
     : REGION_AREAS[selectedRegion];
 
-  const regions: SingaporeRegion[] = ['North', 'South', 'East', 'West'];
+  const regions: SingaporeRegion[] = ['North', 'South', 'East', 'West', 'Central'];
 
   return (
     <div className="flex-1 flex flex-col min-h-0 w-full overflow-hidden">

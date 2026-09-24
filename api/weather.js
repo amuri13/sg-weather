@@ -55,19 +55,115 @@ const FALLBACK_AREAS = [
   { name: 'Yishun', label_location: { latitude: 1.418, longitude: 103.839 } },
 ];
 
+const AREA_EXTENSIONS = {
+  // North
+  Canberra: { mappedArea: 'Sembawang', region: 'north', latitude: 1.443, longitude: 103.829 },
+  Admiralty: { mappedArea: 'Woodlands', region: 'north', latitude: 1.440, longitude: 103.801 },
+  Khatib: { mappedArea: 'Yishun', region: 'north', latitude: 1.417, longitude: 103.832 },
+
+  // South
+  HarbourFront: { mappedArea: 'Bukit Merah', region: 'south', latitude: 1.265, longitude: 103.822 },
+  'Telok Blangah': { mappedArea: 'Bukit Merah', region: 'south', latitude: 1.272, longitude: 103.809 },
+  'Tiong Bahru': { mappedArea: 'Bukit Merah', region: 'south', latitude: 1.286, longitude: 103.827 },
+  Alexandra: { mappedArea: 'Queenstown', region: 'south', latitude: 1.288, longitude: 103.803 },
+
+  // East
+  Simei: { mappedArea: 'Tampines', region: 'east', latitude: 1.343, longitude: 103.953 },
+  Katong: { mappedArea: 'Marine Parade', region: 'east', latitude: 1.306, longitude: 103.905 },
+
+  // West
+  Jurong: { mappedArea: 'Jurong East', region: 'west', latitude: 1.333, longitude: 103.743 },
+
+  // Central
+  Orchard: { mappedArea: 'City', region: 'central', latitude: 1.304, longitude: 103.832 },
+  'River Valley': { mappedArea: 'City', region: 'central', latitude: 1.293, longitude: 103.835 },
+  Newton: { mappedArea: 'Novena', region: 'central', latitude: 1.313, longitude: 103.838 },
+  Bugis: { mappedArea: 'City', region: 'central', latitude: 1.300, longitude: 103.856 },
+  'City Hall': { mappedArea: 'City', region: 'central', latitude: 1.293, longitude: 103.852 },
+  'Marina Bay': { mappedArea: 'City', region: 'central', latitude: 1.280, longitude: 103.854 },
+};
+
 const AREA_TO_REGION = {
-  Woodlands: 'north', Yishun: 'north', Sembawang: 'north', Mandai: 'north', 'Sungei Kadut': 'north', 'Lim Chu Kang': 'north', Seletar: 'north',
-  City: 'south', 'Bukit Merah': 'south', Queenstown: 'south', Sentosa: 'south', 'Southern Islands': 'south', 'Marine Parade': 'south', Tanglin: 'south', Novena: 'south',
-  Bedok: 'east', Tampines: 'east', 'Pasir Ris': 'east', Changi: 'east', 'Paya Lebar': 'east', Geylang: 'east', Kallang: 'east', Hougang: 'east', Serangoon: 'east', Sengkang: 'east', Punggol: 'east', 'Pulau Ubin': 'east', 'Pulau Tekong': 'east',
-  'Jurong East': 'west', 'Jurong West': 'west', 'Jurong Island': 'west', 'Boon Lay': 'west', Pioneer: 'west', Tuas: 'west', Clementi: 'west', 'Bukit Batok': 'west', 'Bukit Panjang': 'west', 'Bukit Timah': 'west', 'Choa Chu Kang': 'west', Tengah: 'west', 'Jalan Bahar': 'west', 'Toa Payoh': 'central', Bishan: 'central', 'Ang Mo Kio': 'central', 'Central Water Catchment': 'central', 'Western Islands': 'west', 'Western Water Catchment': 'west',
+  // North
+  Woodlands: 'north',
+  Yishun: 'north',
+  Sembawang: 'north',
+  Canberra: 'north',
+  Admiralty: 'north',
+  Khatib: 'north',
+  Mandai: 'north',
+  'Sungei Kadut': 'north',
+  'Lim Chu Kang': 'north',
+  Seletar: 'north',
+
+  // South
+  HarbourFront: 'south',
+  Sentosa: 'south',
+  'Telok Blangah': 'south',
+  'Tiong Bahru': 'south',
+  Alexandra: 'south',
+  Queenstown: 'south',
+  'Bukit Merah': 'south',
+  'Southern Islands': 'south',
+
+  // East
+  Tampines: 'east',
+  'Pasir Ris': 'east',
+  Bedok: 'east',
+  Simei: 'east',
+  Changi: 'east',
+  'Paya Lebar': 'east',
+  Katong: 'east',
+  'Marine Parade': 'east',
+  Geylang: 'east',
+  Hougang: 'east',
+  Serangoon: 'east',
+  Sengkang: 'east',
+  Punggol: 'east',
+  'Pulau Ubin': 'east',
+  'Pulau Tekong': 'east',
+
+  // West
+  Jurong: 'west',
+  Clementi: 'west',
+  'Bukit Batok': 'west',
+  'Bukit Panjang': 'west',
+  'Choa Chu Kang': 'west',
+  'Boon Lay': 'west',
+  'Jurong East': 'west',
+  'Jurong West': 'west',
+  'Jurong Island': 'west',
+  Pioneer: 'west',
+  Tuas: 'west',
+  Tengah: 'west',
+  'Bukit Timah': 'west',
+  'Jalan Bahar': 'west',
+  'Western Islands': 'west',
+  'Western Water Catchment': 'west',
+
+  // Central
+  Orchard: 'central',
+  'River Valley': 'central',
+  Novena: 'central',
+  Newton: 'central',
+  Bishan: 'central',
+  'Toa Payoh': 'central',
+  Kallang: 'central',
+  Bugis: 'central',
+  'City Hall': 'central',
+  'Marina Bay': 'central',
+  City: 'central',
+  'Ang Mo Kio': 'central',
+  Tanglin: 'central',
+  'Central Water Catchment': 'central',
 };
 
 const REGION_MAPPING = {
   north: 'Woodlands',
-  south: 'City',
+  south: 'HarbourFront',
   east: 'Tampines',
-  west: 'Jurong East',
-  central: 'Bishan',
+  west: 'Jurong',
+  central: 'Orchard',
 };
 
 /**
@@ -609,34 +705,56 @@ export default async function handler(req, res) {
       ? twoHrRes.data.area_metadata
       : FALLBACK_AREAS;
 
-  const validAreas = areaMetadata.map((a) => a.name);
+  const validAreas = Array.from(
+    new Set([...areaMetadata.map((a) => a.name), ...Object.keys(AREA_EXTENSIONS)])
+  );
 
   const isRegionQuery = Object.prototype.hasOwnProperty.call(REGION_MAPPING, areaQuery.toLowerCase());
   const effectiveAreaQuery = isRegionQuery ? REGION_MAPPING[areaQuery.toLowerCase()] : areaQuery;
 
-  // Case-insensitive, trimmed comparison
-  const matchedArea = areaMetadata.find(
-    (a) => a.name.trim().toLowerCase() === effectiveAreaQuery.toLowerCase()
+  // Check extensions first (for sub-neighborhoods requested by user)
+  const extensionEntry = Object.entries(AREA_EXTENSIONS).find(
+    ([name]) => name.trim().toLowerCase() === effectiveAreaQuery.toLowerCase()
   );
 
-  if (!matchedArea) {
-    setStatus(400);
-    return sendJson({
-      error: 'Unknown area',
-      validAreas,
-    });
+  let displayAreaName;
+  let forecastAreaName;
+  let targetLocation;
+  let regionKey;
+
+  if (extensionEntry) {
+    const [name, meta] = extensionEntry;
+    displayAreaName = name;
+    forecastAreaName = meta.mappedArea;
+    targetLocation = { latitude: meta.latitude, longitude: meta.longitude };
+    regionKey = isRegionQuery ? areaQuery.toLowerCase() : meta.region;
+  } else {
+    const matchedArea = areaMetadata.find(
+      (a) => a.name.trim().toLowerCase() === effectiveAreaQuery.toLowerCase()
+    );
+
+    if (!matchedArea) {
+      setStatus(400);
+      return sendJson({
+        error: 'Unknown area',
+        validAreas,
+      });
+    }
+
+    displayAreaName = matchedArea.name;
+    forecastAreaName = matchedArea.name;
+    targetLocation = matchedArea.label_location;
+    regionKey = isRegionQuery
+      ? areaQuery.toLowerCase()
+      : AREA_TO_REGION[matchedArea.name] || 'central';
   }
 
-  const regionKey = isRegionQuery
-    ? areaQuery.toLowerCase()
-    : AREA_TO_REGION[matchedArea.name] || 'south';
-
   // Extract readings using nearest observation Area calculation
-  const forecastData = extractForecast(twoHrRes, matchedArea.name);
-  const temperatureData = extractNearestReading(tempRes, matchedArea.label_location);
-  const rainfallData = extractNearestReading(rainRes, matchedArea.label_location);
-  const humidityData = extractNearestReading(humidityRes, matchedArea.label_location);
-  const windSpeedData = extractNearestReading(windSpeedRes, matchedArea.label_location);
+  const forecastData = extractForecast(twoHrRes, forecastAreaName);
+  const temperatureData = extractNearestReading(tempRes, targetLocation);
+  const rainfallData = extractNearestReading(rainRes, targetLocation);
+  const humidityData = extractNearestReading(humidityRes, targetLocation);
+  const windSpeedData = extractNearestReading(windSpeedRes, targetLocation);
 
   // Extract higher-level outlooks & atmospheric indices
   const twentyFourHrData = extractTwentyFourHr(twentyFourHrRes, regionKey);
@@ -650,11 +768,12 @@ export default async function handler(req, res) {
   }
 
   setStatus(200);
+  const regionCapitalized = regionKey.charAt(0).toUpperCase() + regionKey.slice(1).toLowerCase();
   return sendJson({
     area: isRegionQuery
-      ? `${areaQuery.charAt(0).toUpperCase() + areaQuery.slice(1).toLowerCase()} (${matchedArea.name})`
-      : matchedArea.name,
-    region: regionKey.charAt(0).toUpperCase() + regionKey.slice(1).toLowerCase(),
+      ? `${regionCapitalized} (${displayAreaName})`
+      : displayAreaName,
+    region: regionCapitalized,
     validAreas,
     keyConfigured,
     forecast: forecastData,

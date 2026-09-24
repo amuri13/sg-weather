@@ -156,4 +156,4 @@ export interface HealthResponse {
   timestamp: string;
 }
 
-export type SingaporeRegion = 'North' | 'South' | 'East' | 'West';
+export type SingaporeRegion = 'North' | 'South' | 'East' | 'West' | 'Central';
