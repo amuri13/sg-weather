@@ -1,0 +1,7 @@
+{
+  "name": "Singapore Live Weather & Transit",
+  "description": "Live Singapore real-time weather readings and 2-hour forecasts across North, South, East, and West Singapore powered by data.gov.sg.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
