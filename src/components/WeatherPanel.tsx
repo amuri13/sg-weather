@@ -9,21 +9,17 @@ import {
   Clock,
   AlertTriangle,
   Info,
-  Compass,
   Activity,
   Sun,
   ShieldAlert,
   Calendar,
   Layers,
-  CloudSun,
-  ShieldCheck,
-  CheckCircle2,
-  AlertCircle
+  CloudSun
 } from 'lucide-react';
-import { WeatherResponse, ForecastItem, SingaporeRegion, HealthResponse } from '../types.ts';
+import { WeatherResponse, ForecastItem, SingaporeRegion } from '../types.ts';
 import { WeatherIcon } from './WeatherIcon.tsx';
 
-export type WeatherTab = 'live' | 'air' | 'forecast24' | 'outlook4d' | 'diagnostics';
+export type WeatherTab = 'live' | 'air' | 'forecast24' | 'outlook4d';
 
 export const REGION_AREAS: Record<SingaporeRegion, string[]> = {
   North: [
@@ -121,7 +117,6 @@ export const WeatherPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState<WeatherTab>('live');
 
   const [data, setData] = useState<WeatherResponse | null>(null);
-  const [healthData, setHealthData] = useState<HealthResponse | null>(null);
   const [availableAreas, setAvailableAreas] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -164,29 +159,17 @@ export const WeatherPanel: React.FC = () => {
     }
   }, []);
 
-  const fetchHealth = useCallback(async () => {
-    try {
-      const res = await fetch('/api/health');
-      if (res.ok) {
-        const json: HealthResponse = await res.json();
-        setHealthData(json);
-      }
-    } catch (_) {}
-  }, []);
-
   useEffect(() => {
     fetchWeather(selectedArea);
-    fetchHealth();
-  }, [selectedArea, fetchWeather, fetchHealth]);
+  }, [selectedArea, fetchWeather]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       fetchWeather(selectedArea);
-      fetchHealth();
     }, 60000);
 
     return () => clearInterval(interval);
-  }, [selectedArea, fetchWeather, fetchHealth]);
+  }, [selectedArea, fetchWeather]);
 
   useEffect(() => {
     countdownTimerRef.current = setInterval(() => {
@@ -213,7 +196,6 @@ export const WeatherPanel: React.FC = () => {
 
   const handleManualRefresh = () => {
     fetchWeather(selectedArea, true);
-    fetchHealth();
   };
 
   const isTempValid =
@@ -408,22 +390,11 @@ export const WeatherPanel: React.FC = () => {
             <Calendar className="w-3.5 h-3.5 text-amber-500" />
             <span>4-Day Outlook</span>
           </button>
-
-          <button
-            onClick={() => setActiveTab('diagnostics')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
-              activeTab === 'diagnostics'
-                ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
-            }`}
-          >
-            <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
-            <span>API Diagnostics</span>
-          </button>
         </nav>
 
-        <div className="hidden sm:flex items-center gap-1.5 text-[11px] font-mono text-slate-500 shrink-0">
-          <span>{data?.keyConfigured ? 'Authenticated Quota' : 'Anonymous Rate Tier'}</span>
+        <div className="flex items-center gap-1 text-[11px] font-medium text-slate-500 shrink-0">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+          <span>Singapore Standard Time (+08:00)</span>
         </div>
       </div>
 
@@ -1011,95 +982,6 @@ export const WeatherPanel: React.FC = () => {
                 4-day outlook not available right now
               </div>
             )}
-          </div>
-        )}
-
-        {/* ========================================================================= */}
-        {/* TAB 5: API DIAGNOSTICS */}
-        {/* ========================================================================= */}
-        {activeTab === 'diagnostics' && (
-          <div className="h-full flex flex-col justify-between space-y-3">
-            {/* Top Diagnostics Status Badges */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 shrink-0">
-              <div className="p-3.5 bg-white border border-slate-200 rounded-lg shadow-2xs">
-                <div className="text-[11px] text-slate-500 font-medium">Service Status</div>
-                <div className="mt-1 flex items-center gap-2">
-                  {healthData?.allAnswered ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  ) : (
-                    <AlertCircle className="w-4 h-4 text-amber-500" />
-                  )}
-                  <span className="text-base font-bold text-slate-900 uppercase">
-                    {healthData?.status || (loading ? 'Checking...' : 'Unknown')}
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-3.5 bg-white border border-slate-200 rounded-lg shadow-2xs">
-                <div className="text-[11px] text-slate-500 font-medium">API Credential Tier</div>
-                <div className="mt-1 flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span className="text-sm font-semibold text-slate-900">
-                    {healthData?.keyConfigured ? 'Authenticated Key' : 'Anonymous Rate Tier'}
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-3.5 bg-white border border-slate-200 rounded-lg shadow-2xs">
-                <div className="text-[11px] text-slate-500 font-medium">Endpoints Monitored</div>
-                <div className="mt-1 text-base font-mono font-bold text-slate-900">
-                  {healthData?.endpointCount || 10} Real-Time APIs
-                </div>
-              </div>
-            </div>
-
-            {/* Compact Endpoints Grid */}
-            <div className="border border-slate-200 rounded-xl bg-white flex-1 min-h-0 overflow-y-auto shadow-2xs">
-              <div className="px-3.5 py-2 bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-700 flex items-center justify-between">
-                <span>Upstream Endpoints (data.gov.sg)</span>
-                <span className="text-[10px] text-slate-400 font-normal">HTTP Response Codes</span>
-              </div>
-
-              <div className="divide-y divide-slate-100 text-xs">
-                {healthData?.endpoints &&
-                  Object.entries(healthData.endpoints).map(([endpointKey, details]) => {
-                    const is2xx = details.status >= 200 && details.status < 300;
-                    const is429 = details.status === 429;
-
-                    return (
-                      <div
-                        key={endpointKey}
-                        className="px-3.5 py-2 flex items-center justify-between gap-3"
-                      >
-                        <div className="truncate">
-                          <span className="font-semibold text-slate-900 font-mono text-[11px]">
-                            {endpointKey}
-                          </span>
-                          {details.reason && (
-                            <span className="text-[10px] text-rose-600 ml-2 font-medium">
-                              ({details.reason})
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span
-                            className={`font-mono text-[10px] font-bold px-2 py-0.5 rounded ${
-                              is2xx
-                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                : is429
-                                ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                                : 'bg-rose-50 text-rose-700 border border-rose-200'
-                            }`}
-                          >
-                            HTTP {details.status}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
           </div>
         )}
       </div>
